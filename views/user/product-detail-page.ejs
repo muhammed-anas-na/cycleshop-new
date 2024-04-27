@@ -1,0 +1,499 @@
+<%- include('../partials/user-header')%>
+
+<head>
+    <style>
+        .icon-hover:hover {
+            border-color: #3b71ca !important;
+            background-color: white !important;
+            color: #3b71ca !important;
+        }
+
+        .icon-hover:hover i {
+            color: #3b71ca !important;
+        }
+
+        #img-zoomer-box {
+            max-width: 500px !important;
+            height: auto !important;
+            position: relative !important;
+            margin: 10px auto !important;
+        }
+
+        selectedImage {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        #img-zoomer-box:hover,
+        #img-zoomer-box:active {
+            cursor: zoom-in !important;
+            display: block !important;
+        }
+
+        #img-zoomer-box:hover #img-2,
+        #img-zoomer-box:active #img-2 {
+            opacity: 1 !important;
+        }
+
+        #img-2 {
+            width: 340px !important;
+            height: 340px !important;
+            background: url('/upload/product/<%=data.images[0]%>') no-repeat #FFF;
+            box-shadow: 0 5px 10px -2px rgba(0, 0, 0, 0.3);
+            pointer-events: none !important;
+            position: absolute !important;
+            opacity: 0;
+            border: 4px solid whitesmoke;
+            z-index: 99;
+            border-radius: 100%;
+            display: block;
+            transition: opacity .2s;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.min.js"></script>
+</head>
+
+
+<section class="py-5">
+    <div class="container">
+        
+        <div class="row gx-5">
+            <aside class="col-lg-6">
+                <div class="border rounded-4 mb-3 d-flex justify-content-center">
+                        <div id="img-zoomer-box">
+                            <img id="selectedImage" style="max-width: 100%; max-height: 100vh; margin: auto;"
+                                class="rounded-4 fit" src="/upload/product/<%=data.images[0]%>" />
+                            <div id="img-2"></div>
+                        </div>
+                </div>
+                <div class="d-flex justify-content-center mb-3">
+                    <% for (i=0; i < data.images.length; i++) { %>
+                        <a data-fslightbox="mygallery" class="border mx-1 rounded-2" data-type="image" href="#"
+                            onclick="changeImage('<%= data.images[i] %>')" class="item-thumb">
+                            <img width="60" height="45" class="rounded-2" src="/upload/product/<%= data.images[i] %>" />
+                        </a>
+                        <% } %>
+                </div>
+                <!-- thumbs-wrap.// -->
+                <!-- gallery-wrap .end// -->
+            </aside>
+            <main class="col-lg-6">
+                <div class="ps-lg-3">
+                    <h4 class="title text-dark">
+                        <%=data.name%>
+                    </h4>
+                    <div class="d-flex flex-row my-3">
+                        <div class="text-warning mb-1 me-2">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span class="ms-1">
+                                4.5
+                            </span>
+                        </div>
+                        <%if(data.unit<=0){%>
+                            <span class="text-danger ms-2">Out of stock</span>
+                        <%}else{%>
+                            <span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1"></i>
+                                <%=data.unit%> orders
+                            </span>
+                            <span class="text-success ms-2">In stock</span>
+                        <%}%>
+                    </div>
+                    <span style='color:red;text-decoration:line-through'>
+                        <span style='color:black'>₹<%=data.regular_price%></span>
+                    </span>
+
+                    <div class="mb-3">
+                        <span class="h5">₹<%=data.sale_price%></span>
+                    </div>
+
+                    <p>
+                        <%=data.description%>
+                    </p>
+
+                    <div class="row">
+                        <dt class="col-3">Type:</dt>
+                        <dd class="col-9">Regular</dd>
+
+                        <dt class="col-3">Color</dt>
+                        <dd class="col-9">Black</dd>
+
+                        <dt class="col-3">Brand</dt>
+                        <dd class="col-9">Ninty One</dd>
+                    </div>
+
+                    <hr />
+                        <div class="row mb-4">
+                            <div class="col-md-4 col-6">
+                                <label class="mb-2">Size</label>
+                                <select id="size" name="size" class="form-select border border-secondary"
+                                    style="height: 35px;">
+                                    <option>Small</option>
+                                    <option>Medium</option>
+                                    <option>Large</option>
+                                </select>
+                            </div>
+                            <!-- col.// -->
+
+                            <div class="col-md-4 col-6 mb-3">
+                                <label class="mb-2 d-block">Quantity</label>
+                                <div class="input-group mb-3" style="width: 170px;">
+                                    <button class="btn btn-white border border-secondary px-3" type="button"
+                                        id="decrementButton" data-mdb-ripple-color="dark">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input name="quantity" type="text" id="quantityInput"
+                                        class="form-control text-center border border-secondary" value="1"
+                                        aria-label="Example text with button addon"
+                                        aria-describedby="decrementButton" />
+                                    <button onclick="checkStock('<%=data.unit%>')" class="btn btn-white border border-secondary px-3" type="button"
+                                        id="incrementButton" data-mdb-ripple-color="dark">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <a id="buyNowButton" onclick="buynow('<%=data._id%>')" type="submit" class="btn btn-warning shadow-0 p-2"><i class="fas fa-bolt"></i> Buy now </a>
+                        <a onclick="AddToCart('<%=data._id%>' , '<%=data.unit%>')" class="btn btn-primary shadow-0 p-2 text-white"> <i
+                                class="me-1 fa fa-shopping-basket"></i> Add to cart</a>
+                        <a onclick="addToWishList('<%=data._id%>')" href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i
+                                class="me-1 fa fa-heart fa-lg"></i> Save </a>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+<!-- content -->
+<footer class="text-center text-lg-start text-muted bg-primary mt-3">
+    <!-- Section: Links  -->
+    <section class="">
+        <div class="container text-center text-md-start pt-4 pb-4">
+            <!-- Grid row -->
+            <div class="row mt-3">
+                <!-- Grid column -->
+                <div class="col-12 col-lg-3 col-sm-12 mb-2">
+                    <!-- Content -->
+                    <a href="https://mdbootstrap.com/" target="_blank" class="text-white h2">
+                        MDB
+                    </a>
+                    <p class="mt-1 text-white">
+                        © 2023 Copyright: MDBootstrap.com
+                    </p>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-6 col-sm-4 col-lg-2">
+                    <!-- Links -->
+                    <h6 class="text-uppercase text-white fw-bold mb-2">
+                        Store
+                    </h6>
+                    <ul class="list-unstyled mb-4">
+                        <li><a class="text-white-50" href="#">About us</a></li>
+                        <li><a class="text-white-50" href="#">Find store</a></li>
+                        <li><a class="text-white-50" href="#">Categories</a></li>
+                        <li><a class="text-white-50" href="#">Blogs</a></li>
+                    </ul>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-6 col-sm-4 col-lg-2">
+                    <!-- Links -->
+                    <h6 class="text-uppercase text-white fw-bold mb-2">
+                        Information
+                    </h6>
+                    <ul class="list-unstyled mb-4">
+                        <li><a class="text-white-50" href="#">Help center</a></li>
+                        <li><a class="text-white-50" href="#">Money refund</a></li>
+                        <li><a class="text-white-50" href="#">Shipping info</a></li>
+                        <li><a class="text-white-50" href="#">Refunds</a></li>
+                    </ul>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-6 col-sm-4 col-lg-2">
+                    <!-- Links -->
+                    <h6 class="text-uppercase text-white fw-bold mb-2">
+                        Support
+                    </h6>
+                    <ul class="list-unstyled mb-4">
+                        <li><a class="text-white-50" href="#">Help center</a></li>
+                        <li><a class="text-white-50" href="#">Documents</a></li>
+                        <li><a class="text-white-50" href="#">Account restore</a></li>
+                        <li><a class="text-white-50" href="#">My orders</a></li>
+                    </ul>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-12 col-sm-12 col-lg-3">
+                    <!-- Links -->
+                    <h6 class="text-uppercase text-white fw-bold mb-2">Newsletter</h6>
+                    <p class="text-white">Stay in touch with latest updates about our products and offers</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control border" placeholder="Email" aria-label="Email"
+                            aria-describedby="button-addon2" />
+                        <button class="btn btn-light border shadow-0" type="button" id="button-addon2"
+                            data-mdb-ripple-color="dark">
+                            Join
+                        </button>
+                    </div>
+                </div>
+                <!-- Grid column -->
+            </div>
+            <!-- Grid row -->
+        </div>
+    </section>
+    <!-- Section: Links  -->
+
+    <div class="">
+        <div class="container">
+            <div class="d-flex justify-content-between py-4 border-top">
+                <!--- payment --->
+                <div>
+                    <i class="fab fa-lg fa-cc-visa text-white"></i>
+                    <i class="fab fa-lg fa-cc-amex text-white"></i>
+                    <i class="fab fa-lg fa-cc-mastercard text-white"></i>
+                    <i class="fab fa-lg fa-cc-paypal text-white"></i>
+                </div>
+                <!--- payment --->
+
+                <!--- language selector --->
+                <div class="dropdown dropup">
+                    <a class="dropdown-toggle text-white" href="#" id="Dropdown" role="button"
+                        data-mdb-toggle="dropdown" aria-expanded="false"> <i
+                            class="flag-united-kingdom flag m-0 me-1"></i>English </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="Dropdown">
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-united-kingdom flag"></i>English <i
+                                    class="fa fa-check text-success ms-2"></i></a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-poland flag"></i>Polski</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-china flag"></i>中文</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-japan flag"></i>日本語</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-germany flag"></i>Deutsch</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-france flag"></i>Français</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-spain flag"></i>Español</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-russia flag"></i>Русский</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#"><i class="flag-portugal flag"></i>Português</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--- language selector --->
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Footer -->
+
+
+<script>
+
+    function addToWishList(proId){
+        $.ajax({
+            url:'/add-to-wishlist',
+            method:'post',
+            data:{
+                proId
+            },
+            success:(response)=>{
+                if(response.success == true){
+                    Swal.fire({
+                    title: 'WISHLIST',
+                    text: 'Product added to wishlist.',
+                    icon: 'success',
+                    timer: 5000
+                    })
+                }else if(response.err == true){
+                    Swal.fire({
+                    title: 'Error',
+                    text: 'Error while adding to cart.',
+                    icon: 'error',
+                    timer: 5000
+                    })
+                }else{
+                    Swal.fire({
+                    title: 'Login',
+                    text: 'Login to add to wishlist.',
+                    icon: 'error',
+                    timer: 5000
+                    })
+				}
+            }
+        })
+    }
+
+    function buynow(proId){
+        const quantity = document.getElementById("quantityInput").value
+        const size = document.getElementById('size').value
+        const myLink = document.getElementById('buyNowButton');
+        myLink.setAttribute('href', '/buy-now?proId='+proId+'&quantity='+quantity+'&size='+size);
+        const unit = '<%=data.unit%>'
+        if(parseInt(unit)<=0){
+                Swal.fire({
+                    title: 'STOCK',
+                    text: 'Out of stock.',
+                    icon: 'warning',
+                    timer: 5000
+                })
+        }else{
+            $.ajax({
+            url:'/buy-now',
+            method:'get',
+            data:{
+                proId,
+                quantity,
+                size,
+            },
+        })   
+        }
+    }
+    let zoomer = function () {
+        document.querySelector('#img-zoomer-box')
+            .addEventListener('mousemove', function (e) {
+                let original = document.querySelector('#selectedImage'),
+                    magnified = document.querySelector('#img-2'),
+                    style = magnified.style,
+                    x = e.pageX - this.offsetLeft,
+                    y = e.pageY - this.offsetTop,
+                    imgWidth = original.offsetWidth,
+                    imgHeight = original.offsetHeight,
+                    xperc = ((x / imgWidth) * 100),
+                    yperc = ((y / imgHeight) * 100);
+
+
+                if (x > (.01 * imgWidth)) {
+                    xperc += (.15 * xperc);
+                };
+
+                if (y >= (.01 * imgHeight)) {
+                    yperc += (.15 * yperc);
+                };
+
+                style.backgroundPositionX = (xperc - 9) + '%';
+                style.backgroundPositionY = (yperc - 9) + '%';
+
+                style.left = (x - 180) + 'px';
+                style.top = (y - 180) + 'px';
+
+            }, false);
+    }();
+    function AddToCart(proId,stock) {
+        if(stock<=0){
+            Swal.fire({
+                    title: 'STOCK!',
+                    text: 'Quantity exceed the unit the in cart.',
+                    icon: 'error',
+                    timer: 5000
+            })
+            return;
+        }
+        const quantity = document.getElementById("quantityInput").value
+        const size = document.getElementById('size').value
+        $.ajax({
+            url: '/add-to-cart/' + proId,
+            method: 'post',
+            data: {
+                quantity: quantity,
+                size: size,
+            },
+            success(response) {
+                if(response.added == true){
+						Swal.fire({
+						title: 'CART',
+						text: 'Product ADDED TO CART.',
+						icon: 'success',
+						timer: 5000
+					})
+					}else if(response.err == true){
+						Swal.fire({
+						title: 'STOCK!',
+						text: 'Product is out of stock.',
+						icon: 'error',
+						timer: 5000
+						})
+					}else{
+						location.href='/login'
+					}
+            }
+        })
+    }
+
+    function changeImage(newImageSrc) {
+        document.getElementById('img-2').style.backgroundImage = "url("+'/upload/product/' + newImageSrc + ")";
+        const selectedImage = document.getElementById('selectedImage');
+        const selectedImageLink = document.getElementById('selectedImageLink');
+
+        selectedImage.setAttribute('src', "/upload/product/" + newImageSrc);
+        selectedImageLink.setAttribute('href', "/upload/product/" + newImageSrc);
+    }
+    const decrementButton = document.getElementById("decrementButton");
+    const incrementButton = document.getElementById("incrementButton");
+    const quantityInput = document.getElementById("quantityInput");
+
+    decrementButton.addEventListener("click", () => {
+        let currentQuantity = parseInt(quantityInput.value);
+        if (!isNaN(currentQuantity)) {
+            if(currentQuantity==1){
+                Swal.fire({
+                    title: 'ERROR!',
+                    text: 'Quantity 0 not possible',
+                    icon: 'warning',
+                    timer: 5000
+                })
+            }else{
+                currentQuantity = Math.max(currentQuantity - 1, 0);
+                quantityInput.value = currentQuantity;
+            }
+
+        }
+    });
+
+    incrementButton.addEventListener("click", () => {
+        let currentQuantity = parseInt(quantityInput.value);
+        if (!isNaN(currentQuantity)) {
+            currentQuantity++;
+            quantityInput.value = currentQuantity;
+        }
+    });
+    function checkStock(unit){
+        let quantity = document.getElementById('quantityInput').value;
+        quantity = parseInt(quantity)
+        unit = parseInt(unit)
+        if(quantity+1>unit){
+            Swal.fire({
+                    title: 'STOCK!',
+                    text: 'Product is out of stock.',
+                    icon: 'error',
+                    timer: 5000
+                })
+            document.getElementById('quantityInput').value = quantity-1;
+        }
+    }
+</script>

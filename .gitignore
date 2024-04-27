@@ -1,0 +1,9 @@
+# Ignore the .env file
+.env
+
+# Ignore the entire node_modules directory
+node_modules/
+mongo-config.yaml
+mongo-secret.yaml
+webapp.yaml
+mongo.yaml
